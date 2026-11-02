@@ -28,3 +28,27 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run tests
         run: bash test.sh
+  generate-docs:
+    runs-on: ubuntu-latest
+    needs: build 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate Documentation
+        run: |
+          mkdir -p docs
+          echo "# Документация проекта" > docs/index.md
+          echo "Эта документация сгенерирована автоматически." >> docs/index.md
+          echo "" >> docs/index.md
+          echo "- **Дата последнего обновления:** $(date)" >> docs/index.md
+          echo "- **Ветка:** ${{ github.ref_name }}" >> docs/index.md
+          echo "- **Автор коммита:** ${{ github.actor }}" >> docs/index.md
+
+      - name: Commit and Push docs
+        run: |
+          git config --global user.name MerzL04
+          git config --global user.email reqmer34@gmail.com
+          git add docs/index.md
+          git commit -m "docs: auto-generate documentation [skip ci]" || echo "No changes to commit"
+          git push
